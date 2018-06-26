@@ -1,10 +1,10 @@
 pragma solidity ^0.4.23;
 
 import './abstractions/MarketplaceTemplate.sol';
-import './Ownable.sol';
-import './ProductLib.sol';
+import './common/Destructible.sol';
+import './libs/ProductLib.sol';
 
-contract Marketplace is MarketplaceTemplate, Ownable {
+contract Marketplace is MarketplaceTemplate, Destructible {
     using ProductLib for ProductLib.Product;
 
     bytes32[] public products;    

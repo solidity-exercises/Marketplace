@@ -1,7 +1,6 @@
 const Marketplace = artifacts.require("../contracts/Marketplace.sol");
-const Ownable = artifacts.require("../contracts/Ownable.sol");
-const SafeMath = artifacts.require("../contracts/SafeMath.sol");
-const ProductLib = artifacts.require("../contracts/ProductLib.sol");
+const SafeMath = artifacts.require("../contracts/common/SafeMath.sol");
+const ProductLib = artifacts.require("../contracts/libs/ProductLib.sol");
 
 module.exports = (deployer) => {
 	deployer.deploy(SafeMath);
