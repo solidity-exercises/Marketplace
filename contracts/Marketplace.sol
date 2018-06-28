@@ -9,9 +9,9 @@ contract Marketplace is MarketplaceTemplate, Destructible {
 
     bytes32[] public products;    
 
-    event LogNewProduct(bytes32 indexed id, string name, uint price, uint quantity);
-    event LogNewPurchase(bytes32 indexed id, uint quantity);
-    event LogStockUpdate(bytes32 indexed id, uint quantity);
+    event LogNewProduct(string name, uint price, uint quantity, bytes32 id);
+    event LogNewPurchase(string name, uint quantity, bytes32 id);
+    event LogStockUpdate(string name, uint quantity, bytes32 id);
     event LogWithdrawal();
 
     mapping (bytes32=>ProductLib.Product) public productById;
@@ -22,15 +22,16 @@ contract Marketplace is MarketplaceTemplate, Destructible {
     }
 
     function buy(bytes32 _id, uint _quantity) public productExists(_id) payable {
+        require(productById[_id].quantity >= _quantity);
         require(productById[_id].getProductPrice(_quantity) <= msg.value);
 
-        emit LogNewPurchase(_id, _quantity);
+        emit LogNewPurchase(productById[_id].name, _quantity, _id);
 
         productById[_id].purchaseProduct(_quantity);
     }
     
     function update(bytes32 _id, uint _newQuantity) public productExists(_id) onlyOwner {
-        emit LogStockUpdate(_id, _newQuantity);
+        emit LogStockUpdate(productById[_id].name, _newQuantity, _id);
 
         productById[_id].updateProduct(_newQuantity);
     }
@@ -38,7 +39,6 @@ contract Marketplace is MarketplaceTemplate, Destructible {
     // creates a new product and returns its ID
     function newProduct(string _name, uint _price, uint _quantity) public onlyOwner returns(bytes32) {
         require(_quantity > 0);
-        require(_price > 0);
         require(bytes(_name).length > 0);
 
         bytes32 id = keccak256(abi.encodePacked(_name, _price, _quantity, now));
@@ -48,7 +48,7 @@ contract Marketplace is MarketplaceTemplate, Destructible {
         products.push(id);
         productById[id] = ProductLib.Product({name: _name, price: _price, quantity: _quantity});
 
-        emit LogNewProduct(id, _name, _price, _quantity);
+        emit LogNewProduct(_name, _price, _quantity, id);
 
         return id;
     }
